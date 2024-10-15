@@ -1,0 +1,12 @@
+
+*.pyc
+test_package/build
+
+build*
+
+CMakeUserPresets.json
+
+.vscode
+.vs
+.clion
+.conan-data

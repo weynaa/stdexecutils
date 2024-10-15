@@ -1,0 +1,124 @@
+stages:
+  - analyze
+  - build
+  - publish
+
+variables:
+  FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
+  PIPELINE_NAME: "Default Pipeline"
+
+workflow:
+  name: $PIPELINE_NAME
+  rules:
+    - if: $CI_COMMIT_REF_PROTECTED == "true" #Build protected branches (master, release,... )
+      variables:
+        PIPELINE_NAME: 'Build $CI_COMMIT_REF_NAME'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" #Build for Merge-request
+      variables:
+        PIPELINE_NAME: 'Merge request $CI_MERGE_REQUEST_ID'
+    - if: $CI_COMMIT_TAG # New tag marks a release
+      variables:
+        PIPELINE_NAME: 'Release $CI_COMMIT_TAG'
+    - when: never      # Dont run anything otherwise
+
+
+#default job keywords
+default:
+  image: ci-ubuntu
+  before_script:
+    - conan config install https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.local/team/conan-config.git
+    - conan config set storage.path=$(pwd)/.conan-data
+  interruptible: true
+  # Cache of conan packages
+  cache:
+    key: global-conan-cache
+    paths:
+      - .conan-data/
+
+build:
+  stage: build
+  script:
+    - conan create . @ --build=missing -pr=${COMPILER}.jinja -pr=${BUILD_TYPE}.jinja -o $(conan inspect . --raw name):shared=$SHARED
+    - conan install "$(conan inspect . --raw name)/$(conan inspect . --raw version)@" -if=install_folder -pr=${COMPILER}.jinja -pr=${BUILD_TYPE}.jinja  -g deploy -o shared=$SHARED
+  tags:
+    - $OS
+    - $ARCH
+  artifacts:
+    paths:
+      - install_folder/
+  parallel:
+    matrix:
+      - OS: ['linux']
+        BUILD_TYPE: ['debug','release']
+        ARCH: ['x64']
+        SHARED: [ 'True' ]
+        COMPILER: ['gcc', 'clang']
+
+analyze-clang-format:
+  stage: analyze
+  script:
+    - find . -regex '.*\.\(c\|h\|cpp\|hpp\|cc\|cxx\)' -not -path '*/.*' -exec clang-format --style=file:.clang-format --dry-run {} \; 2>&1 | tee stderr.log
+    - cat stderr.log
+    - "[ ! -s stderr.log ]"
+
+analyze-asan:
+  stage: analyze
+  script: 
+    - conan create . @ --build=missing -pr=clang.jinja -pr=debug.jinja -pr=sanitize-address.jinja
+
+analyze-tsan:
+  stage: analyze
+  script: 
+    - conan create . @ --build=missing -pr=clang.jinja -pr=debug.jinja -pr=sanitize-thread.jinja
+
+analyze-leak:
+  stage: analyze
+  script: 
+    - conan create . @ --build=missing -pr=clang.jinja -pr=debug.jinja -pr=sanitize-leak.jinja
+
+analyze-ubsan:
+  stage: analyze
+  script: 
+    - conan create . @ --build=missing -pr=clang.jinja -pr=debug.jinja -pr=sanitize-undefined.jinja
+
+analyze-coverage:
+  stage: analyze
+  script:
+    - mkdir build && cd build
+    - conan install .. --build=missing -pr=gcc.jinja -pr=debug.jinja
+    - cmake .. -DBUILD_COVERAGE=TRUE --preset debug
+    - cmake --build Debug --target=cppsample_coverage
+  coverage: /^\s*lines\.*:\s*\d+.\d+\%.*$/
+  tags:
+    - "linux"
+    - "x64"
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: build/Debug/cppsample_coverage_sonarqube.xml
+
+pages:
+  stage: publish
+  script:
+    - mkdir build && cd build
+    - conan install .. --build=missing -pr=gcc.jinja -pr=debug.jinja
+    - cmake .. --preset debug
+    - cmake --build Debug --target=doxygen
+    - mv Debug/docs/html ../public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    paths:
+      - public
+
+publish-artifactory:
+  stage: publish
+  only:
+    - tags
+  script:
+    - conan user repo-writer -r artifactory-local -p "${ARTIFACTORY_SECRET}"
+    - conan upload "$(conan inspect . --raw name)/$(conan inspect . --raw version)@" --parallel --all -r artifactory-local
+  release:
+    tag_name: '$CI_COMMIT_TAG'
+    description: '$CI_COMMIT_TAG'

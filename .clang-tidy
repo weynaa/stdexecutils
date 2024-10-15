@@ -1,0 +1,5 @@
+Checks:          'bugprone-*,boost-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,google-*,misc-*,mpi-*,modernize-*,-modernize-use-trailing-return-type,performance-*,portability-*,readability-*,-readability-identifier-length'
+WarningsAsErrors: 'True'
+HeaderFilterRegex: '.'
+AnalyzeTemporaryDtors: false
+FormatStyle:     file
