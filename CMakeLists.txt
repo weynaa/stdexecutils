@@ -90,7 +90,6 @@ install(TARGETS ${PROJECT_NAME} default_warnings
         EXPORT ${PROJECT_NAME}Targets
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/exports/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT ${PROJECT_NAME}Targets
         FILE ${PROJECT_NAME}Targets.cmake
@@ -107,7 +106,7 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
-  COMPATIBILITY ExactVersion
+  COMPATIBILITY SameMajorVersion
 )
 
 install(FILES

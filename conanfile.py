@@ -4,13 +4,13 @@ from conan.tools.files import update_conandata
 from conan.tools.scm import Git
 
 
-class CppsampleConan(ConanFile):
+class StdexecutilsConan(ConanFile):
     name = "stdexecutils"
 
     # Optional metadata
     license = "<Put the package license here>"
     author = "mwechner"
-    url = "https://cppsample.example.com"
+    url = "https://github.com/weynaa/stdexecutils"
     description = "Utilities extending the P2300 senders"
 
     # Binary configuration
@@ -23,7 +23,7 @@ class CppsampleConan(ConanFile):
 
     # Add dependencies here
     def requirements(self):
-        self.requires("stdexec/2024.09")
+        self.requires("stdexec/2024.09", visible=True)
 
     # Add dependencies for building the package here
     def build_requirements(self):
@@ -77,4 +77,3 @@ class CppsampleConan(ConanFile):
     def package_info(self):
         self.cpp_info.bindirs = []
         self.cpp_info.libdirs = []
-
