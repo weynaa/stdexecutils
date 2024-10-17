@@ -15,8 +15,8 @@ class StdexecutilsConan(ConanFile):
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {}
-    default_options = {}
+    options = {"with_qt": [True, False]}
+    default_options = {"with_qt": False}
 
     # generators
     generators = ["CMakeDeps"]
@@ -24,6 +24,8 @@ class StdexecutilsConan(ConanFile):
     # Add dependencies here
     def requirements(self):
         self.requires("stdexec/2024.09", visible=True)
+        if(self.options.with_qt):
+           self.requires("qt/[>=6.7]", visible=True)
 
     # Add dependencies for building the package here
     def build_requirements(self):

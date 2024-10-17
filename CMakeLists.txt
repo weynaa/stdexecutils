@@ -39,19 +39,20 @@ project(${CONAN_PACKAGE_NAME}
 
 find_package(stdexec REQUIRED)
 
+find_package(Qt6 COMPONENTS Core) # Optional
+
 #Compiler Warnings
 include(cmake/compiler_warnings.cmake)
 add_library(default_warnings INTERFACE)
 set_project_warnings(default_warnings WARNINGS_AS_ERRORS ${TREAT_WARNINGS_AS_ERRORS})
 
-#Source Files
-file(GLOB_RECURSE PUBLIC_HEADERS CONFIGURE_DEPENDS "include/*.hpp")
-
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/" FILES ${PUBLIC_HEADERS})
-
 #Library Target
 add_library(${PROJECT_NAME} INTERFACE ${PUBLIC_HEADERS})
 
+target_sources(${PROJECT_NAME} 
+    PRIVATE 
+        include/stdexecutils/spawn_stdfuture.hpp
+)
 
 target_include_directories(${PROJECT_NAME} INTERFACE 
   $<INSTALL_INTERFACE:include> 
@@ -66,6 +67,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME} INTERFACE STDEXEC::stdexec)
+
+if(Qt6_FOUND)
+    target_sources(${PROJECT_NAME}
+      PRIVATE 
+            include/stdexecutils/qthread_scheduler.hpp
+    )
+    target_link_libraries(${PROJECT_NAME} INTERFACE Qt6::Core)
+endif()
 
 #Set coverage flags
 if(BUILD_COVERAGE)
