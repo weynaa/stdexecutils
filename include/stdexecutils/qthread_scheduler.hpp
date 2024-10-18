@@ -12,7 +12,6 @@
 #include <chrono>
 
 namespace stdexecutils {
-class QThreadScheduler;
 
 class QThreadScheduler {
 public:
