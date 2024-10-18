@@ -33,7 +33,7 @@ public:
 		QThread* const m_thread;
 	};
 
-	//Sender for schedule
+	// Sender for schedule
 	template <class Recv>
 	struct op_state : public detail::immovable {
 		op_state(Recv&& receiver, QThread* thread)
@@ -71,8 +71,8 @@ public:
 		QThread* const m_thread;
 	};
 
-	//Sender for schedule_at
-		template <class Recv>
+	// Sender for schedule_at
+	template <class Recv>
 	struct timeout_op_state : public detail::immovable {
 		timeout_op_state(Recv&& receiver, QThread* thread,
 		                 std::chrono::system_clock::time_point deadline)
@@ -127,8 +127,8 @@ public:
 		const std::chrono::system_clock::time_point m_deadline;
 	};
 
-	//Sender for schedule_after
-		template <class Recv>
+	// Sender for schedule_after
+	template <class Recv>
 	struct delay_op_state : public detail::immovable {
 		delay_op_state(Recv&& receiver, QThread* thread,
 		               std::chrono::system_clock::duration duration)
@@ -175,7 +175,7 @@ public:
 		auto get_env() const noexcept -> env { return env{m_thread}; }
 
 	private:
-		QThread* const                              m_thread;
+		QThread* const                            m_thread;
 		const std::chrono::system_clock::duration m_duration;
 	};
 
