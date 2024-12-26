@@ -39,19 +39,21 @@ project(${CONAN_PACKAGE_NAME}
 
 find_package(stdexec REQUIRED)
 
-find_package(Qt6 COMPONENTS Core) # Optional
-
 #Compiler Warnings
 include(cmake/compiler_warnings.cmake)
-add_library(default_warnings INTERFACE)
-set_project_warnings(default_warnings WARNINGS_AS_ERRORS ${TREAT_WARNINGS_AS_ERRORS})
 
 #Library Target
 add_library(${PROJECT_NAME} INTERFACE ${PUBLIC_HEADERS})
 
+#TODO: strict warnings make problems with stdexec  
+#set_project_warnings(${PROJECT_NAME} WARNINGS_AS_ERRORS ${TREAT_WARNINGS_AS_ERRORS})
+
 target_sources(${PROJECT_NAME} 
-    PRIVATE 
-        include/stdexecutils/spawn_stdfuture.hpp
+    INTERFACE FILE_SET HEADERS
+    BASE_DIRS
+      include/
+    FILES 
+      include/stdexecutils/spawn_stdfuture.hpp
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE 
@@ -67,14 +69,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME} INTERFACE STDEXEC::stdexec)
-
-if(Qt6_FOUND)
-    target_sources(${PROJECT_NAME}
-      PRIVATE 
-            include/stdexecutils/qthread_scheduler.hpp
-    )
-    target_link_libraries(${PROJECT_NAME} INTERFACE Qt6::Core)
-endif()
 
 #Set coverage flags
 if(BUILD_COVERAGE)
@@ -95,10 +89,10 @@ endif()
 #Install Package
 include(GNUInstallDirs)
 
-install(TARGETS ${PROJECT_NAME} default_warnings
+install(TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}Targets
+        FILE_SET HEADERS
 )
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT ${PROJECT_NAME}Targets
         FILE ${PROJECT_NAME}Targets.cmake
