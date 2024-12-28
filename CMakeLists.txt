@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
 #Options
-option(TREAT_WARNINGS_AS_ERRORS "Treat warnings as errors" TRUE)
 option(BUILD_TESTS "Build unit-tests" TRUE)
 option(ENABLE_CLANG_TIDY "Run clang-tidy with the build, makes the build slower" FALSE)
 option(BUILD_COVERAGE "Generate Code-Coverage Information " FALSE)
@@ -54,11 +53,6 @@ target_sources(${PROJECT_NAME}
       include/
     FILES 
       include/stdexecutils/spawn_stdfuture.hpp
-)
-
-target_include_directories(${PROJECT_NAME} INTERFACE 
-  $<INSTALL_INTERFACE:include> 
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 

@@ -1,11 +1,9 @@
-file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "*.cpp")
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${TEST_SOURCES})
-add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
+add_executable(${PROJECT_NAME}_test stdexecutils_test.cpp)
 
 set(PROJECT_TEST_NAME ${PROJECT_NAME}_test)
 
 target_link_libraries(${PROJECT_TEST_NAME} PRIVATE GTest::gtest GTest::gtest_main ${PROJECT_NAME})
-gtest_discover_tests(${PROJECT_TEST_NAME})
+gtest_add_tests(TARGET ${PROJECT_TEST_NAME})
 
 if(BUILD_COVERAGE)
     target_link_libraries(${PROJECT_TEST_NAME} PRIVATE gcov)

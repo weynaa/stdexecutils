@@ -12,6 +12,8 @@ class StdexecutilsConan(ConanFile):
     author = "mwechner"
     url = "https://github.com/weynaa/stdexecutils"
     description = "Utilities extending the P2300 senders"
+    
+    package_type = "header-library"
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
@@ -23,7 +25,7 @@ class StdexecutilsConan(ConanFile):
 
     # Add dependencies here
     def requirements(self):
-        self.requires("stdexec/2024.09", visible=True)
+        self.requires("stdexec/2024.09")
 
     # Add dependencies for building the package here
     def build_requirements(self):
