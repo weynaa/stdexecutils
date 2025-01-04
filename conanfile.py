@@ -25,11 +25,11 @@ class StdexecutilsConan(ConanFile):
 
     # Add dependencies here
     def requirements(self):
-        self.requires("stdexec/2024.09")
+        self.requires("stdexec/24.09")
 
     # Add dependencies for building the package here
     def build_requirements(self):
-        self.test_requires("gtest/[>=1.12.1]")
+        self.test_requires("gtest/[>=1.12.1 <2]")
 
     def layout(self):
         cmake_layout(self)
