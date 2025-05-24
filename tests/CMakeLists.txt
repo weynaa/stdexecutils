@@ -1,4 +1,4 @@
-add_executable(${PROJECT_NAME}_test stdexecutils_test.cpp)
+add_executable(${PROJECT_NAME}_test stdexecutils_test.cpp channel_test.cpp)
 
 set(PROJECT_TEST_NAME ${PROJECT_NAME}_test)
 

@@ -53,6 +53,7 @@ target_sources(${PROJECT_NAME}
       include/
     FILES 
       include/stdexecutils/spawn_stdfuture.hpp
+      include/stdexecutils/channel.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
