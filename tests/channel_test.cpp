@@ -35,6 +35,7 @@ TEST(ChannelTest, AsyncReceive) {
 		                      for (auto i = 0; i < nValues; ++i) {
 			                      const auto tid = std::this_thread::get_id();
 			                      receivedValues.push_back(co_await rx.recv());
+								  // co_await won't migrate to another thread
 			                      EXPECT_EQ(std::this_thread::get_id(), tid);
 		                      }
 	                      }(std::move(rx), receivedValues)));
@@ -136,6 +137,6 @@ TEST(ChannelTest, TestSerializability) {
 			c2 = recvValue;
 		}
 	}
-	ASSERT_EQ(c1, nValues);
-	ASSERT_EQ(c2, -nValues);
+	EXPECT_EQ(c1, nValues);
+	EXPECT_EQ(c2, -nValues);
 }
